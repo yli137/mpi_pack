@@ -1,0 +1,43 @@
+(gdb) (gdb) Breakpoint 1 at 0x4006b8
+<function, no debug info> _init;
+Breakpoint 2 at 0x4006f0
+<function, no debug info> MPI_Comm_rank@plt;
+Breakpoint 3 at 0x400700
+<function, no debug info> __stack_chk_fail@plt;
+Breakpoint 4 at 0x400710
+<function, no debug info> printf@plt;
+Breakpoint 5 at 0x400720
+<function, no debug info> __libc_start_main@plt;
+Breakpoint 6 at 0x400730
+<function, no debug info> MPI_Send@plt;
+Breakpoint 7 at 0x400740
+<function, no debug info> MPI_Init@plt;
+Breakpoint 8 at 0x400750
+<function, no debug info> MPI_Comm_size@plt;
+Breakpoint 9 at 0x400760
+<function, no debug info> sleep@plt;
+Breakpoint 10 at 0x400780
+<function, no debug info> _start;
+Breakpoint 11 at 0x4007b0
+<function, no debug info> deregister_tm_clones;
+Breakpoint 12 at 0x4007f0
+<function, no debug info> register_tm_clones;
+Breakpoint 13 at 0x400830
+<function, no debug info> __do_global_dtors_aux;
+Breakpoint 14 at 0x400850
+<function, no debug info> frame_dummy;
+Breakpoint 15 at 0x40087a
+<function, no debug info> main;
+Breakpoint 16 at 0x400970
+<function, no debug info> __libc_csu_init;
+Breakpoint 17 at 0x4009e0
+<function, no debug info> __libc_csu_fini;
+Breakpoint 18 at 0x4009e4
+<function, no debug info> _fini;
+(gdb) Starting program: /home/yicheng/Desktop/C/mpi_test/mpi 
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+
+Breakpoint 14, 0x00007ffff6f58b00 in frame_dummy ()
+   from /lib/x86_64-linux-gnu/libpthread.so.0
+(gdb) 
