@@ -6,9 +6,51 @@
 #define MIN_LENGTH 1024
 #define MAX_LENGTH 1024*1024
 
-typedef struct buffer{
-	double dv[10];
-} buffer;
+void double_pack(int count){
+	double *inbuf = (double*)malloc(sizeof(double)*count);
+	double *obuf = (double*)malloc(sizeof(double)*count);
+	int start = 0;
+	double st, et;
+
+	printf("This is mpi pack:\n");
+	for(unsigned int i = 0; i < 10; i++){
+		st = MPI_Wtime();
+		MPI_Pack(inbuf, 10000, MPI_DOUBLE, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
+		et = MPI_Wtime();
+		
+		printf("%d used time: %.7f mm\n", i, (et - st) * 1000);
+	}
+
+	free(inbuf);
+	free(obuf);
+}
+
+void double_manual(int count){
+	double *inbuf = (double*)malloc(sizeof(double) * count);
+	double *obuf = (double*)malloc(sizeof(double) * count);
+	int start = 0;
+	double st, et;
+
+	printf("This is manual pack double:\n");
+	for(unsigned int i = 0; i < 10; i++){
+		st = MPI_Wtime();
+		for(unsigned int j = 0; j < 10000; j++){
+			obuf[start] = inbuf[start];
+			start++;
+		}		
+		et = MPI_Wtime();
+		printf("%d used time: %.7f mm\n", i, (et - st) * 1000);
+	}
+
+	free(inbuf);
+	free(obuf);
+}
+
+void do_pack(){
+	double_pack(100000);
+	printf("\n");
+	double_manual(100000);
+}
 
 int
 main(int argc, char **argv){
@@ -24,50 +66,8 @@ main(int argc, char **argv){
 		exit(0);
 	}
 
-	MPI_Datatype type;
-	MPI_Type_vector(1000, 1, 10, MPI_DOUBLE, &type );
-	MPI_Type_commit(&type);
+	do_pack();	
 
-	double *buf = (double*)malloc(sizeof(double) * 10000);
-	for(int i = 0; i < 10000; i++)
-		buf[i] = i + 100;
-	double *obuf = (double*)malloc(sizeof(double) * 10000);
-
-	for(int i = 0; i < 20; i++)
-		printf("%.2f ", buf[i]);
-	
-	double st, et;
-	int position = 0;
-	printf("\nUsing MPI_Pack:\n");
-	for(int j = 0; j < 10; j++){
-		st = MPI_Wtime();
-		for(unsigned int i = 0; i < 1000; i++){
-			MPI_Pack(buf, 1, MPI_DOUBLE, obuf, sizeof(double) * 10000, &i, MPI_COMM_WORLD);
-			//position += sizeof(double);
-		}
-		et = MPI_Wtime();
-		printf("%d Used time: %.7f mm\n", j, (et - st) * 1000);
-	}
-
-/*****
-	printf("\nPack by for loop\n");
-	for(int j = 0; j < 10; j++){
-		int count = 0;
-		st = MPI_Wtime();
-		for(unsigned int i = 0; i < 10000; i++){
-			obuf[count] = buf[count];
-			count+=1;
-		}
-
-		et = MPI_Wtime();
-		printf("%d Used time: %.7f mm\n", j, (et-st)*1000);
-	}
-*****/
-	for(int i = 0; i < 20; i++)
-		printf("%.2f ", obuf[i]);
-
-	printf("\n");	
-	MPI_Type_free(&type);
 	MPI_Finalize();
 	return 0;
 
