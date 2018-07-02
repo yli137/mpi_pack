@@ -7,8 +7,8 @@
 #define MAX_LENGTH 1024*1024
 
 void double_pack(int count){
-	double *inbuf = (double*)malloc(sizeof(double)*count);
-	double *obuf = (double*)malloc(sizeof(double)*count);
+	double *inbuf = (double*)malloc(sizeof(double)*count*10);
+	double *obuf = (double*)malloc(sizeof(double)*(count * 10));
 	int start = 0;
 	double st, et;
 
@@ -17,7 +17,10 @@ void double_pack(int count){
 		st = MPI_Wtime();
 		MPI_Pack(inbuf, 10000, MPI_DOUBLE, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
 		et = MPI_Wtime();
-		
+
+		start++;
+		if(i == 8)
+			start = 0;
 		printf("%d used time: %.7f mm\n", i, (et - st) * 1000);
 	}
 
