@@ -91,7 +91,36 @@ void double_vector(int count){
 	}
 }
 
+void try_contig(){
+	double *buf = (double*)malloc(sizeof(double) * 50);
+	int i = 0;
+	for(; i < 50; i++){
+		buf[i] = i;
+	}
+
+	for(i = 0; i < 50; i++)
+		printf("%.f ", buf[i]);
+
+	double *obuf = (double*)malloc(sizeof(double) * 50);
+
+	MPI_Datatype ddt;
+	MPI_Type_contiguous(1, MPI_DOUBLE, &ddt);
+
+	printf("\n");
+	int start = 0;
+	MPI_Pack(buf, 1, ddt, obuf, sizeof(double) * 50, &start, MPI_COMM_WORLD);
+	for(i = 0; i < 50; i++){
+		printf("%.f ", obuf[i]);
+	}
+
+	MPI_Type_free(&ddt);
+	free(buf);
+	free(obuf);
+
+}
+
 void do_pack(){
+	try_contig();
 
 /***********
 	printf("This is mpi pack only:\n");
