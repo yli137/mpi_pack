@@ -9,20 +9,21 @@
 void double_pack(int count){
 	double *inbuf = (double*)malloc(sizeof(double)*count*10);
 	double *obuf = (double*)malloc(sizeof(double)*(count * 10));
+
 	int start = 0;
 	double st, et;
 
-	printf("This is mpi pack:\n");
+//	printf("This is mpi pack:\n");
+	st = MPI_Wtime();
 	for(unsigned int i = 0; i < 10; i++){
-		st = MPI_Wtime();
+	//	st = MPI_Wtime();
 		MPI_Pack(inbuf, 10000, MPI_DOUBLE, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
-		et = MPI_Wtime();
+	//	et = MPI_Wtime();
 
-		start++;
-		if(i == 8)
-			start = 0;
-		printf("%d used time: %.7f mm\n", i, (et - st) * 1000);
+	//	printf("%d used time: %.7f mm\n", i, (et - st) * 1000);
 	}
+	et = MPI_Wtime();
+	printf("Used %.7f s\n", et - st);
 
 	free(inbuf);
 	free(obuf);
@@ -34,25 +35,35 @@ void double_manual(int count){
 	int start = 0;
 	double st, et;
 
-	printf("This is manual pack double:\n");
+//	printf("\nThis is manual pack double:\n");
+
+	st = MPI_Wtime();
 	for(unsigned int i = 0; i < 10; i++){
-		st = MPI_Wtime();
+	//	st = MPI_Wtime();
 		for(unsigned int j = 0; j < 10000; j++){
 			obuf[start] = inbuf[start];
 			start++;
 		}		
-		et = MPI_Wtime();
-		printf("%d used time: %.7f mm\n", i, (et - st) * 1000);
+	//	et = MPI_Wtime();
+	//	printf("%d used time: %.7f mm\n", i, (et - st) * 1000);
 	}
+	et = MPI_Wtime();
+	printf("Used %.7f s\n", (et - st));
+
 
 	free(inbuf);
 	free(obuf);
 }
 
 void do_pack(){
-	double_pack(100000);
-	printf("\n");
-	double_manual(100000);
+
+	printf("This is mpi pack:\n");
+	for(int i = 0; i < 10; i++)
+		double_pack(100000);
+
+	printf("\nThis is manual pack:\n");
+	for(int i = 0; i < 10; i++)
+		double_manual(100000);
 }
 
 int
