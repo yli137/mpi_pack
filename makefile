@@ -1,4 +1,4 @@
-CC=/home/yicheng/Desktop/openmpi/ompi-master/after_config/bin/mpicc
+CC=/home/yli137/openmpi/ompi/after_config/bin/mpicc
 
 all: mpi
 
