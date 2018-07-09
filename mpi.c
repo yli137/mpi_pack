@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>
+#include<string.h>
 
 void double_pack(int count){
 	double *inbuf = (double*)malloc(sizeof(double)*count);
@@ -9,15 +10,29 @@ void double_pack(int count){
 
 	int start = 0;
 	double st, et;
-	unsigned int i;
-
-	//	for(i = 0; i < 10; i++){
 	st = MPI_Wtime();
-	MPI_Pack(inbuf, 100000, MPI_DOUBLE, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
+	MPI_Pack(inbuf, count, MPI_DOUBLE, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
 	et = MPI_Wtime();
-	printf("%d used time: %.7f mm\n", i, (et - st) * 1000);
-	//	}
+	printf("Used time: %.7f mm\n", (et - st) * 1000);
 	et = MPI_Wtime();
+
+	free(inbuf);
+	free(obuf);
+}
+
+void double_pack_10(int count){
+	double *inbuf = (double*)malloc(sizeof(double) * count);
+	int i, j;
+	double *obuf = (double*)malloc(sizeof(double) * count);
+
+	int start = 0;
+	double st, et;
+	st = MPI_Wtime();
+	for(i = 0; i < count; i++){
+		MPI_Pack(inbuf, 1, MPI_DOUBLE, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
+	}
+	et = MPI_Wtime();
+	printf("Used: %.7f mm\n", (et - st) * 1000);
 
 	free(inbuf);
 	free(obuf);
@@ -34,7 +49,7 @@ void double_manual(int count){
 		obuf[j] = inbuf[j];
 	}		
 	et = MPI_Wtime();
-	printf("Used time: %.7f mm\n", i, (et - st) * 1000);
+	printf("Used time: %.7f mm\n", (et - st) * 1000);
 
 	free(inbuf);
 	free(obuf);
@@ -50,13 +65,10 @@ void double_contig(int count){
 	MPI_Type_contiguous(count, MPI_DOUBLE, &ddt);
 	MPI_Type_commit(&ddt);
 
-	unsigned int i;
-	//	for(i = 0; i < 10; i++){
 	st = MPI_Wtime();
 	MPI_Pack(buf, 1, ddt, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
 	et = MPI_Wtime();
 	printf("Used %.7f mm\n", (et - st) * 1000);
-	//	}
 
 	free(buf);
 	free(obuf);
@@ -87,37 +99,6 @@ void double_vector(int count){
 	MPI_Type_free(&ddt);
 }
 
-void try_contig(){
-	double *buf = (double*)malloc(sizeof(double) * 50);
-	int i = 0;
-	for(; i < 50; i++){
-		buf[i] = i;
-	}
-
-	for(i = 0; i < 50; i++)
-		printf("%.f ", buf[i]);
-
-	double *obuf = (double*)malloc(sizeof(double) * 50);
-
-	MPI_Datatype ddt;
-	MPI_Type_vector(10, 2, 3, MPI_DOUBLE, &ddt);
-	MPI_Type_commit(&ddt);
-
-	printf("\n");
-	int start = 0;
-	MPI_Pack(buf, 1, ddt, obuf, sizeof(double) * 50, &start, MPI_COMM_WORLD);
-	for(i = 0; i < 50; i++){
-		printf("%.f ", obuf[i]);
-	}
-
-	printf("\n");
-
-	MPI_Type_free(&ddt);
-	free(buf);
-	free(obuf);
-
-}
-
 void do_pack(){
 	//	try_contig();
 	unsigned int i;
@@ -137,7 +118,6 @@ void do_pack(){
 	printf("\nThis is manual pack:\n");
 	for(i = 0; i < 10; i++)
 		double_manual(1000000);
-
 }
 
 int
