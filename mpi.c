@@ -1,106 +1,16 @@
-#include</home/yicheng/Desktop/openmpi/ompi-master/ompi/include/mpi.h>
+#include</home/yli137/openmpi/ompi/ompi/include/mpi.h>
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>
 #include<string.h>
-
-void double_pack(int count){
-	double *inbuf = (double*)malloc(sizeof(double)*count);
-	double *obuf = (double*)malloc(sizeof(double)*count);
-
-	int start = 0;
-	double st, et;
-	st = MPI_Wtime();
-	MPI_Pack(inbuf, count, MPI_DOUBLE, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
-	et = MPI_Wtime();
-	printf("Used time: %.7f mm\n", (et - st) * 1000);
-	et = MPI_Wtime();
-
-	free(inbuf);
-	free(obuf);
-}
-
-void double_pack_10(int count){
-	double *inbuf = (double*)malloc(sizeof(double) * count);
-	int i, j;
-	double *obuf = (double*)malloc(sizeof(double) * count);
-
-	int start = 0;
-	double st, et;
-	st = MPI_Wtime();
-	for(i = 0; i < count; i++){
-		MPI_Pack(inbuf, 1, MPI_DOUBLE, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
-	}
-	et = MPI_Wtime();
-	printf("Used: %.7f mm\n", (et - st) * 1000);
-
-	free(inbuf);
-	free(obuf);
-}
-
-void double_manual(int count){
-	double *inbuf = (double*)malloc(sizeof(double) * count);
-	double *obuf = (double*)malloc(sizeof(double) * count);
-	double st, et;
-	unsigned int i, j;
-
-	st = MPI_Wtime();
-	for(j = 0; j < count; j++){
-		obuf[j] = inbuf[j];
-	}		
-	et = MPI_Wtime();
-	printf("Used time: %.7f mm\n", (et - st) * 1000);
-
-	free(inbuf);
-	free(obuf);
-}
-
-void double_contig(int count){
-	double st, et;
-	int start = 0;
-	double *buf = (double*)malloc(sizeof(double) * count);
-	double *obuf = (double*)malloc(sizeof(double) * count);
-
-	MPI_Datatype ddt;
-	MPI_Type_contiguous(count, MPI_DOUBLE, &ddt);
-	MPI_Type_commit(&ddt);
-
-	st = MPI_Wtime();
-	MPI_Pack(buf, 1, ddt, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
-	et = MPI_Wtime();
-	printf("Used %.7f mm\n", (et - st) * 1000);
-
-	free(buf);
-	free(obuf);
-	MPI_Type_free(&ddt);
-}
-
-void double_vector(int count){
-	int start = 0;
-	double st, et;	
-	MPI_Datatype ddt;
-	MPI_Type_vector(1, count, count, MPI_DOUBLE, &ddt);
-	MPI_Type_commit(&ddt);
-
-	unsigned int i;
-	//	for(i = 0; i < 10; i++){
-	double *buf = (double*)malloc(sizeof(double) * count);
-	double *obuf = (double*)malloc(sizeof(double) * count);
-
-	st = MPI_Wtime();
-	MPI_Pack(buf, 1, ddt, obuf, sizeof(double) * count, &start, MPI_COMM_WORLD);
-	et = MPI_Wtime();
-	printf("Used %.7f mm\n", (et - st) * 1000);
-
-	free(buf);
-	free(obuf);
-	//	}
-
-	MPI_Type_free(&ddt);
-}
+#include"pack_test.h"
 
 void do_pack(){
-	//	try_contig();
+	//tested contig data
+	//found contig data for mpi pack is simply just memcpy
+	//hardly anything to optimize
+	
+	/************
 	unsigned int i;
 
 	printf("This is mpi pack only:\n");
@@ -118,6 +28,27 @@ void do_pack(){
 	printf("\nThis is manual pack:\n");
 	for(i = 0; i < 10; i++)
 		double_manual(1000000);
+	*************/
+
+	//from here are non-contig data test
+	int i;
+	printf("Two cache line per one double using MPI_vector\n");
+	for(i = 0; i < 11; i++){
+		double_noncontig_pack(1000000, i);
+	}
+
+	printf("\nManually packing 1 double every 2 cache line\n");
+	for(i = 0; i < 11; i++){
+		double_noncontig_pack_manual(1000000, i);
+	}
+
+	printf("\n1 double per cache line using MPI_vector\n");
+	for(i = 0; i < 11; i++)
+		double_noncontig_pack_1c(1000000, i);
+
+	printf("\n1 double per cache line manually\n");
+	for(i = 0; i < 11; i++)
+		double_noncontig_pack_manual_1c(1000000, i);
 }
 
 int
