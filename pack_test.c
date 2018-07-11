@@ -1,9 +1,9 @@
-#include</home/yli137/openmpi/ompi/ompi/include/mpi.h>
+#include</home/yicheng/Desktop/openmpi/ompi-master/ompi/include/mpi.h>
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>
 #include<string.h>
-#include"pack_test.h"
+#include "pack_test.h"
 
 void double_pack(int count){
 	double *inbuf = (double*)malloc(sizeof(double)*count);
@@ -99,7 +99,7 @@ void double_vector(int count){
 	MPI_Type_free(&ddt);
 }
 
-void double_noncontig_pack(int count, int num){
+void double_noncontig_pack_2c(int count, int num){
 	//pick one double every two cache line
 	//for cluster one cache line = 64 bytes = 8 doubles
 	//one double every 16 doubles
@@ -128,7 +128,7 @@ void double_noncontig_pack(int count, int num){
 	free(obuf);
 }
 
-void double_noncontig_pack_manual(int count, int num){
+void double_noncontig_pack_manual_2c(int count, int num){
 	double *inbuf = (double*)malloc(sizeof(double) * count * 16);
 	int i = 0, j;
 	for(i; i < count * 16; i++)
@@ -196,7 +196,97 @@ void double_noncontig_pack_manual_1c(int count, int num){
 
 }
 
+void double_noncontig_pack_3c(int count, int num){
+        double *inbuf = (double*)malloc(sizeof(double) * count * 24);
+        int i = 0;
+        for(i; i < count * 24; i++)
+                inbuf[i] = (double)i;
+        double *obuf = (double*)malloc(sizeof(double) * count);
 
+        MPI_Datatype ddt;
+        MPI_Type_vector(count, 1, 24, MPI_DOUBLE, &ddt);
+        MPI_Type_commit(&ddt);
+
+        double st, et;
+        int position = 0;
+        st = MPI_Wtime();
+        MPI_Pack(inbuf, 1, ddt, obuf, sizeof(double) * count, &position, MPI_COMM_WORLD);
+        et = MPI_Wtime();
+        printf("%d used %.7fms\n", num, (et - st) * 1000);
+
+        MPI_Type_free(&ddt);
+        free(inbuf);
+        free(obuf);
+}
+
+void double_noncontig_pack_manual_3c(int count, int num){
+        double *inbuf = (double*)malloc(sizeof(double) * count * 24);
+        int i = 0, j;
+        for(i; i < count * 24; i++)
+                inbuf[i] = (double)i;
+        double *obuf = (double*)malloc(sizeof(double) * count);
+
+        double st, et;
+        j = 0;
+
+        st = MPI_Wtime();
+        for(i = 0; i < count * 24; i+=24){
+                obuf[j] = inbuf[i];
+                j++;
+        }
+        et = MPI_Wtime();
+        printf("%d used %.7fms\n", num, (et - st) * 1000);
+
+        free(inbuf);
+        free(obuf);
+
+}
+
+void double_noncontig_pack_c(int count, int num, int c){
+        double *inbuf = (double*)malloc(sizeof(double) * count * 8 * c);
+        int i = 0;
+        for(i; i < count * 8 * c; i++)
+                inbuf[i] = (double)i;
+        double *obuf = (double*)malloc(sizeof(double) * count);
+
+        MPI_Datatype ddt;
+        MPI_Type_vector(count, 1, 8 * c, MPI_DOUBLE, &ddt);
+        MPI_Type_commit(&ddt);
+
+        double st, et;
+        int position = 0;
+        st = MPI_Wtime();
+        MPI_Pack(inbuf, 1, ddt, obuf, sizeof(double) * count, &position, MPI_COMM_WORLD);
+        et = MPI_Wtime();
+        printf("%d used %.7fms\n", num, (et - st) * 1000);
+
+        MPI_Type_free(&ddt);
+        free(inbuf);
+        free(obuf);
+}
+
+void double_noncontig_pack_manual_c(int count, int num, int c){
+        double *inbuf = (double*)malloc(sizeof(double) * count * 8 * c);
+        int i = 0, j;
+        for(i; i < count * 8 * c; i++)
+                inbuf[i] = (double)i;
+        double *obuf = (double*)malloc(sizeof(double) * count);
+
+        double st, et;
+        j = 0;
+
+        st = MPI_Wtime();
+        for(i = 0; i < count * 8 * c; i+=8 * c){
+                obuf[j] = inbuf[i];
+                j++;
+        }
+        et = MPI_Wtime();
+        printf("%d used %.7fms\n", num, (et - st) * 1000);
+
+        free(inbuf);
+        free(obuf);
+
+}
 
 
 

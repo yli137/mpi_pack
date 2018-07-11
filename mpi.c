@@ -1,4 +1,4 @@
-#include</home/yli137/openmpi/ompi/ompi/include/mpi.h>
+#include</home/yicheng/Desktop/openmpi/ompi-master/ompi/include/mpi.h>
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>
@@ -31,24 +31,42 @@ void do_pack(){
 	*************/
 
 	//from here are non-contig data test
+	/********************
 	int i;
 	printf("Two cache line per one double using MPI_vector\n");
 	for(i = 0; i < 11; i++){
-		double_noncontig_pack(1000000, i);
+		double_noncontig_pack_1c(1000000, i);
 	}
 
 	printf("\nManually packing 1 double every 2 cache line\n");
 	for(i = 0; i < 11; i++){
-		double_noncontig_pack_manual(1000000, i);
+		double_noncontig_pack_manual_1c(1000000, i);
 	}
 
 	printf("\n1 double per cache line using MPI_vector\n");
 	for(i = 0; i < 11; i++)
-		double_noncontig_pack_1c(1000000, i);
+		double_noncontig_pack_2c(1000000, i);
 
 	printf("\n1 double per cache line manually\n");
 	for(i = 0; i < 11; i++)
-		double_noncontig_pack_manual_1c(1000000, i);
+		double_noncontig_pack_manual_2c(1000000, i);
+
+	printf("\n1 double per 3 cache line\n");
+	for(i = 0; i < 11; i++)
+		double_noncontig_pack_3c(1000000, i);
+
+	printf("\n1 double per 3 cache line manually\n");
+	for(i = 0; i < 11; i++)
+		double_noncontig_pack_manual_3c(1000000, i);
+
+	*********************/
+
+	int i, j;
+	for(i = 1; i < 11; i++){
+		printf("\n1 double per %d cache line\n", i);
+		for(j = 0; j < 11; j++)
+			double_noncontig_pack_c(1000000, j, i);
+	}
 }
 
 int

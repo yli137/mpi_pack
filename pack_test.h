@@ -7,9 +7,15 @@ void double_manual(int count);
 void double_contig(int count);
 void double_vector(int count);
 
-void double_noncontig_pack(int count, int num);
-void double_noncontig_pack_manual(int count, int num);
+void double_noncontig_pack_2c(int count, int num);
+void double_noncontig_pack_manual_2c(int count, int num);
 void double_noncontig_pack_1c(int count, int num);
 void double_noncontig_pack_manual_1c(int count, int num);
+void double_noncontig_pack_3c(int count, int num);
+void double_noncontig_pack_manual_3c(int count, int num);
+
+void double_noncontig_pack_c(int count, int num, int c);
+void double_noncontig_pack_manual_c(int count, int num, int c);
+
 
 #endif
