@@ -3,6 +3,7 @@
 #include<unistd.h>
 #include<stdlib.h>
 #include<string.h>
+#include<stdalign.h>
 #include "pack_test.h"
 
 void double_pack(int count){
@@ -243,10 +244,12 @@ void double_noncontig_pack_manual_3c(int count, int num){
 }
 
 void double_noncontig_pack_c(int count, int num, int c){
+	//alignas(128)
         double *inbuf = (double*)malloc(sizeof(double) * count * 8 * c);
         int i = 0;
         for(i; i < count * 8 * c; i++)
                 inbuf[i] = (double)i;
+	//alignas(128)
         double *obuf = (double*)malloc(sizeof(double) * count);
 
         MPI_Datatype ddt;
@@ -266,10 +269,12 @@ void double_noncontig_pack_c(int count, int num, int c){
 }
 
 void double_noncontig_pack_manual_c(int count, int num, int c){
+	//alignas(128)
         double *inbuf = (double*)malloc(sizeof(double) * count * 8 * c);
         int i = 0, j;
         for(i; i < count * 8 * c; i++)
                 inbuf[i] = (double)i;
+	//alignas(128)
         double *obuf = (double*)malloc(sizeof(double) * count);
 
         double st, et;

@@ -3,6 +3,7 @@
 #include<unistd.h>
 #include<stdlib.h>
 #include<string.h>
+#include<stdalign.h>
 #include"pack_test.h"
 
 void do_pack(){
@@ -60,12 +61,17 @@ void do_pack(){
 		double_noncontig_pack_manual_3c(1000000, i);
 
 	*********************/
-
 	int i, j;
-	for(i = 1; i < 11; i++){
+	for(i = 1; i < 6; i++){
 		printf("\n1 double per %d cache line\n", i);
 		for(j = 0; j < 11; j++)
 			double_noncontig_pack_c(1000000, j, i);
+	}
+
+	for(i = 1; i < 6; i++){
+		printf("\n1 double per %d cache line\n", i);
+		for(j = 0; j < 11; j++)
+			double_noncontig_pack_manual_c(1000000, j, i);
 	}
 }
 
