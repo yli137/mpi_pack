@@ -1,4 +1,4 @@
-#include</home/yicheng/Desktop/openmpi/ompi-master/ompi/include/mpi.h>
+#include</home/yli137/openmpi/ompi/ompi/include/mpi.h>
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>
@@ -92,15 +92,15 @@ void do_pack(){
 	int i, j, z;
 	double average, out, med;
 	//number of doubles
-	for(i = 1; i < 5; i++){
+	for(i = 1; i < 9; i++){
 		//number of cache line
-		for(j = 1; j < 9; j++){
+		for(j = 1; j < 4; j++){
 			printf("%d doubles in each cache line\n", i);
 			printf("%d cache lines\n", j);
 
 			out = 0;
 			//number of repetition
-			for(z = 0; z < 11; z++){
+			for(z = 0; z < 21; z++){
 				med = num_double_noncontig_pack_c(1000000, z, j, i);
 				if(med != 0)
 					out += med;

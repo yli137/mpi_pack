@@ -1,4 +1,4 @@
-#include</home/yicheng/Desktop/openmpi/ompi-master/ompi/include/mpi.h>
+#include</home/yli137/openmpi/ompi/ompi/include/mpi.h>
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>
