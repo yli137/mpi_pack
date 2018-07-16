@@ -293,14 +293,14 @@ void double_noncontig_pack_manual_c(int count, int num, int c){
 //c is the number of the cache line
 //n is the number of doubles taken from each cache line
 double num_double_noncontig_pack_c(int count, int num, int c, int n){
-        double *inbuf = (double*)malloc(sizeof(double) * count * 4 * c);
+        double *inbuf = (double*)malloc(sizeof(double) * count * 8 * c);
         int i = 0;
-        for(i; i < count * 4 * c; i++)
+        for(i; i < count * 8 * c; i++)
                 inbuf[i] = (double)i;
         double *obuf = (double*)malloc(sizeof(double) * count * n);
 
         MPI_Datatype ddt;
-        MPI_Type_vector(count, n, 4 * c, MPI_DOUBLE, &ddt);
+        MPI_Type_vector(count, n, 8 * c, MPI_DOUBLE, &ddt);
         MPI_Type_commit(&ddt);
 
         double st, et;
@@ -309,37 +309,40 @@ double num_double_noncontig_pack_c(int count, int num, int c, int n){
         MPI_Pack(inbuf, 1, ddt, obuf, sizeof(double) * count * n, &position, MPI_COMM_WORLD);
         et = MPI_Wtime();
 
-	if(num == 0)
-		return 0;
-        //printf("%d used %.7fms\n", num, (et - st) * 1000);
-
         MPI_Type_free(&ddt);
         free(inbuf);
         free(obuf);
+
+	if(num == 0)
+		return 0;
 	return (et - st)*1000;
 }
 
 double num_double_noncontig_pack_manual_c(int count, int num, int c, int n){
         double *inbuf = (double*)malloc(sizeof(double) * count * 8 * c);
-        int i = 0, j;
+        int i = 0, j, z;
         for(i; i < count * 8 * c; i++)
                 inbuf[i] = (double)i;
-        double *obuf = (double*)malloc(sizeof(double) * count * 2);
+        double *obuf = (double*)malloc(sizeof(double) * count * n);
 
         double st, et;
         j = 0;
 
         st = MPI_Wtime();
         for(i = 0; i < count * 8 * c; i+=8 * c){
-                obuf[j] = inbuf[i];
-		obuf[j+1] = inbuf[i+1];
-                j+=2;
+		for(z = i; z < i+n; z++){
+			obuf[j] = inbuf[z];
+		}
+		j+=n;
         }
         et = MPI_Wtime();
-        printf("%d used %.7fms\n", num, (et - st) * 1000);
+	printf("%d used %.7fms\n", num, (et - st) * 1000);
 
         free(inbuf);
         free(obuf);
+
+	if(num == 0)
+		return 0;
 	return (et - st)*1000;
 }
 

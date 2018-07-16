@@ -92,7 +92,8 @@ void do_pack(){
 	int i, j, z;
 	double average, out, med;
 	//number of doubles
-	for(i = 1; i < 9; i++){
+	/**********
+	for(i = 1; i < 5; i++){
 		//number of cache line
 		for(j = 1; j < 4; j++){
 			printf("%d doubles in each cache line\n", i);
@@ -110,6 +111,27 @@ void do_pack(){
 		}
 		printf("\n");
 	}
+*******/
+	printf("\nManual test:\n");
+	for(i = 1; i < 9; i++){
+		//number of cache line
+		for(j = 1; j < 4; j++){
+			printf("%d doubles in each cache line\n", i);
+			printf("%d cache lines\n", j);
+
+			out = 0;
+			//number of repetition
+			for(z = 0; z < 21; z++){
+				med = num_double_noncontig_pack_manual_c(1000000, z, j, i);
+				if(med != 0)
+					out += med;
+			}
+			printf("Average: %.7f ms\n", out / 20);
+			printf("\n");
+		}
+		printf("\n");
+	}
+
 }
 
 int
