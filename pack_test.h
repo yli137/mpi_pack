@@ -17,5 +17,8 @@ void double_noncontig_pack_manual_3c(int count, int num);
 void double_noncontig_pack_c(int count, int num, int c);
 void double_noncontig_pack_manual_c(int count, int num, int c);
 
+double num_double_noncontig_pack_c(int count, int num, int c, int n);
+double num_double_noncontig_pack_manual_c(int count, int num, int c, int n);
+
 
 #endif
